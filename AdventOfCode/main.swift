@@ -14,10 +14,10 @@ func run(dayNumber: Int, inputPath: String) {
     }
 
     guard let input = try? String(
-        contentsOfFile: (inputPath as NSString).appendingPathComponent("day\(dayNumber)_input.txt")
+        contentsOfFile: (inputPath as NSString).appendingPathComponent("\(dayNumber).txt")
     )
     else {
-        debugPrint("Could not read day\(dayNumber)_input.txt file")
+        debugPrint("Could not read \(dayNumber).txt file")
         return
     }
     let day = dayClass.init()
@@ -26,11 +26,11 @@ func run(dayNumber: Int, inputPath: String) {
 
     let part1StartDate = Date()
     let part1 = day.part1(input)
-    print("Part 1 (\(-part1StartDate.timeIntervalSinceNow * 1000) ms): \(part1)")
+    print("Part 1 (\(Int(-part1StartDate.timeIntervalSinceNow * 1000)) ms): \(part1)")
 
     let part2StartDate = Date()
     let part2 = day.part2(input)
-    print("Part 2 (\(-part2StartDate.timeIntervalSinceNow * 1000) ms): \(part2)")
+    print("Part 2 (\(Int(-part2StartDate.timeIntervalSinceNow * 1000)) ms): \(part2)")
     print("")
 }
 

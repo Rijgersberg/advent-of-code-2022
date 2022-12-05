@@ -1,62 +1,41 @@
-//
-//  Day3.swift
-//  AdventOfCode
-//
-
-import Foundation
-
 final class Day3: Day {
-    func bitCounts(_ array: [UInt]) -> [Int] {
-        var counts = Array(repeating: 0, count: 12)
-        for num in array {
-            var num = num
-            for i in 0..<12 {
-                if num & 1 != 0 {
-                    counts[i] += 1
-                }
-                num = num >> 1
-            }
+    
+    func priority(_ char: Character) -> Int {
+        let base: Int
+        if char.isLowercase {
+            base = Int(Character("a").asciiValue!) - 1
+        } else {
+            base = Int(Character("A").asciiValue!) - 26 - 1
         }
-        return counts
+        let thisCharValue = Int(char.asciiValue!)
+        return thisCharValue - base
     }
-
+    
     func part1(_ input: String) -> CustomStringConvertible {
-        let nums = input.lines.compactMap { UInt($0, radix: 2) }
-        let counts = bitCounts(nums)
-        var gamma = UInt()
-        let half = nums.count / 2
-        for i in (0..<12).reversed() {
-            gamma = gamma << 1
-            if counts[i] > half {
-                gamma = gamma | 1
-            }
+        let input = input.components(separatedBy: .newlines).filter{!$0.isEmpty}
+        
+        var prioritySum = 0
+
+        for line in input {
+            let (firstHalf, secondHalf) = line.splitInHalf()
+            let duplicate = Set(firstHalf).intersection(Set(secondHalf)).first!
+            
+            prioritySum += priority(duplicate)
         }
-        return gamma * (~gamma & 0b111111111111)
+        return prioritySum
     }
 
     func part2(_ input: String) -> CustomStringConvertible {
-        let nums = input.lines.compactMap { UInt($0, radix: 2) }
-        var oxygenNums = nums
-        var scrubberNums = nums
-        for i in (0..<12).reversed() {
-            if oxygenNums.count == 1 && scrubberNums.count == 1 {
-                break
-            }
-            if oxygenNums.count > 1 {
-                let oxygenCounts = bitCounts(oxygenNums)
-                let oxygenHalf = Int(ceil(Double(oxygenNums.count) / 2.0))
-                oxygenNums = oxygenNums.filter { num in
-                    ((num >> i) & 1) == (oxygenCounts[i] >= oxygenHalf ? 1 : 0)
-                }
-            }
-            if scrubberNums.count > 1 {
-                let scrubberCounts = bitCounts(scrubberNums)
-                let scrubberHalf = Int(ceil(Double(scrubberNums.count) / 2.0))
-                scrubberNums = scrubberNums.filter { num in
-                    return ((num >> i) & 1) == (scrubberCounts[i] >= scrubberHalf ? 0 : 1)
-                }
-            }
+        let input = input.components(separatedBy: .newlines).filter{!$0.isEmpty}
+        
+        var prioritySum = 0
+        stride(from: 0, to: Int(exactly: input.count)!, by: 3).forEach { i in
+            var chars = Set(input[i])
+            chars = chars.intersection(Set(input[i+1]))
+            chars = chars.intersection(Set(input[i+2]))
+
+            prioritySum += priority(chars.first!)
         }
-        return oxygenNums.first! * scrubberNums.first!
+        return prioritySum
     }
 }

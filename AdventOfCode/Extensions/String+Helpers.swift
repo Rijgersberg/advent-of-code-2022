@@ -15,14 +15,9 @@ extension String {
     var ints: [Int] {
         lines.compactMap { Int($0) }
     }
-}
-
-extension Substring {
-    subscript(_ offset: Int) -> Element {
-        return self[index(startIndex, offsetBy: offset)]
-    }
-
-    subscript(_ range: Range<Int>) -> Substring {
-        return self[index(startIndex, offsetBy: range.lowerBound)..<index(startIndex, offsetBy: range.upperBound)]
+    
+    func splitInHalf() -> (firstHalf: String, secondHalf: String) {
+        return ( String(self.prefix(self.count / 2)),
+                 String(self.suffix(self.count / 2)) )
     }
 }

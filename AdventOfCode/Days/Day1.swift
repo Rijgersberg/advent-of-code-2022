@@ -1,28 +1,25 @@
-//
-//  Day1.swift
-//  AdventOfCode
-//
-
-import Algorithms
-import Foundation
-
 final class Day1: Day {
+    func parse(_ input: String) -> [Int] {
+        var cals = [Int]()
+        var currentElfCal = 0
+        
+        for calString in input.components(separatedBy: .newlines) {
+            if calString.isEmpty {
+                cals.append(currentElfCal)
+                currentElfCal = 0
+            } else {
+                currentElfCal += Int(calString)!
+            }
+        }
+        cals.sort()
+        return cals
+    }
+    
     func part1(_ input: String) -> CustomStringConvertible {
-        return input
-            .split(separator: "\n")
-            .compactMap { Int($0) }
-            .adjacentPairs()
-            .count { $0 < $1 }
+        return parse(input).last!
     }
 
     func part2(_ input: String) -> CustomStringConvertible {
-        return input
-            .split(separator: "\n")
-            .compactMap { Int($0) }
-            .windows(ofCount: 3)
-            .adjacentPairs()
-            .count {
-                $0.sum < $1.sum
-            }
+        return parse(input).suffix(3).sum()
     }
 }

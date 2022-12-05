@@ -1,91 +1,45 @@
-//
-//  Day4.swift
-//  AdventOfCode
-//
-
-import Foundation
+extension ClosedRange {
+    func contains(_ other: ClosedRange) -> Bool {
+        return (other.lowerBound >= self.lowerBound)
+        && (other.upperBound <= self.upperBound)
+    }
+}
 
 final class Day4: Day {
-    class Board {
-        let numbers: [[Int]]
-        var potentialWinners: [[Int]]
-
-        init(_ string: String) {
-            numbers = string
-                .split(separator: "\n")
-                .map { line in
-                    line
-                        .split(separator: " ")
-                        .compactMap { Int($0) }
-                }
-            var potentialWinners = numbers
-            for i in 0..<5 {
-                potentialWinners.append(
-                    [
-                        numbers[0][i],
-                        numbers[1][i],
-                        numbers[2][i],
-                        numbers[3][i],
-                        numbers[4][i]
-                    ]
-                )
-            }
-            self.potentialWinners = potentialWinners
-        }
-
-        func mark(_ number: Int) -> Bool {
-            potentialWinners = potentialWinners.map { row in row.filter { $0 != number } }
-            return potentialWinners.contains { $0.count == 0 }
-        }
+    
+    func parse(_ line: String) -> (firstRange: ClosedRange<Int>, secondRange: ClosedRange<Int>) {
+        let parts = line.split(separator: ",")
+        
+        let firstParts = parts[0].split(separator: "-")
+        let firstRange = Int(firstParts[0])!...Int(firstParts[1])!
+        
+        let secondParts = parts[1].split(separator: "-")
+        let secondRange = Int(secondParts[0])!...Int(secondParts[1])!
+        
+        return (firstRange, secondRange)
     }
-
+   
     func part1(_ input: String) -> CustomStringConvertible {
-        let components = input.components(separatedBy: "\n\n")
-        let numbers = components.first!.split(separator: ",").compactMap { Int($0) }
-        let boards = components.dropFirst().map { Board($0) }
-        for number in numbers {
-            for board in boards {
-                if board.mark(number) {
-                    return board
-                        .potentialWinners
-                        .reduce(Set<Int>()) { s, r in
-                            var set = s
-                            for n in r {
-                                set.insert(n)
-                            }
-                            return set
-                        }
-                        .sum * number
-                }
+        var total = 0
+        for line in input.components(separatedBy: .newlines).filter({!$0.isEmpty}) {
+            let (firstRange, secondRange) = parse(line)
+            
+            if firstRange.contains(secondRange) || secondRange.contains(firstRange) {
+                total += 1
             }
         }
-        return 0
+        return total
     }
 
     func part2(_ input: String) -> CustomStringConvertible {
-        let components = input.components(separatedBy: "\n\n")
-        let numbers = components.first!.split(separator: ",").compactMap { Int($0) }
-        var boards = components.dropFirst().map { Board($0) }
-        for number in numbers {
-            for (i, board) in boards.enumerated().reversed() {
-                if board.mark(number) {
-                    if boards.count == 1 {
-                        return board
-                            .potentialWinners
-                            .reduce(Set<Int>()) { s, r in
-                                var set = s
-                                for n in r {
-                                    set.insert(n)
-                                }
-                                return set
-                            }
-                            .sum * number
-                    } else {
-                        boards.remove(at: i)
-                    }
-                }
+        var total = 0
+        for line in input.components(separatedBy: .newlines).filter({!$0.isEmpty}) {
+            let (firstRange, secondRange) = parse(line)
+            
+            if firstRange.overlaps(secondRange) {
+                total += 1
             }
         }
-        return 0
+        return total
     }
 }

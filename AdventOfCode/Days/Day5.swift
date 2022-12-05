@@ -1,69 +1,51 @@
-//
-//  Day5.swift
-//  AdventOfCode
-//
-
-import Foundation
-
 final class Day5: Day {
-    func part1(_ input: String) -> CustomStringConvertible {
-        var intersections = [String: Int]()
-        input
-            .lines
-            .forEach { line in
-                let components = line
-                    .components(separatedBy: " -> ")
-                    .map { component -> (Int, Int) in
-                        let nums = component
-                            .split(separator: ",")
-                            .compactMap { Int($0) }
-                        return (nums.first!, nums.last!)
-                    }
-                let (start, end) = (components[0], components[1])
-                if start.0 == end.0 {
-                    for y in min(start.1, end.1)...max(start.1, end.1) {
-                        let key = "\(start.0),\(y)"
-                        intersections[key] = (intersections[key] ?? 0) + 1
-                    }
-                } else if start.1 == end.1 {
-                    for x in min(start.0, end.0)...max(start.0, end.0) {
-                        let key = "\(x),\(start.1)"
-                        intersections[key] = (intersections[key] ?? 0) + 1
-                    }
+    func parse(_ lines: [String]) -> (initialState: [[Character]], moves: [(move: Int, from: Int, to: Int)]) {
+        
+        // initial state
+        let initialStatelines = lines[..<(lines.firstIndex(of: "")! - 1)]
+        
+        var initialState = [[Character]](repeating: [Character](), count: 9)
+        for line in initialStatelines {
+            for (idx, char) in line.enumerated() {
+                if char.isLetter {
+                    initialState[idx / 4].insert(char, at: 0)
                 }
             }
-        return intersections.count { $0.value > 1 }
+        }
+        
+        // moves
+        // "move 2 from 4 to 6"
+        let moveLines = lines[(lines.firstIndex(of: "")!+1)...].dropLast()
+        
+        var moves = [(Int, Int, Int)]()
+        for line in moveLines {
+            let parts = line.components(separatedBy: " ").map { Int($0) }.filter{ $0 != nil }
+            moves.append((parts[0]!, parts[1]!, parts[2]!))
+        }
+        
+        return (initialState, moves)
+    }
+    
+    func part1(_ input: String) -> CustomStringConvertible {
+        var (state, moves) = parse(input.components(separatedBy: .newlines))
+        
+        for (move, from, to) in moves {
+            for _ in 0..<move {
+                state[to-1].append(state[from-1].popLast()!)
+            }
+        }
+        return String(state.map{$0.last!})
     }
 
     func part2(_ input: String) -> CustomStringConvertible {
-        var intersections = [String: Int]()
-        input
-            .lines
-            .forEach { line in
-                let components = line
-                    .components(separatedBy: " -> ")
-                    .map { component -> (Int, Int) in
-                        let nums = component
-                            .split(separator: ",")
-                            .compactMap { Int($0) }
-                        return (nums.first!, nums.last!)
-                    }
-                let (start, end) = (components[0], components[1])
-                let (dx, dy) = (
-                    start.0 == end.0 ? 0 : start.0 < end.0 ? 1 : -1,
-                    start.1 == end.1 ? 0 : start.1 < end.1 ? 1 : -1
-                )
-                var point = start
-                while point != end {
-                    let key = "\(point.0),\(point.1)"
-                    intersections[key] = (intersections[key] ?? 0) + 1
-                    point.0 += dx
-                    point.1 += dy
-                }
-
-                let key = "\(point.0),\(point.1)"
-                intersections[key] = (intersections[key] ?? 0) + 1
-            }
-        return intersections.count { $0.value > 1 }
+        var (state, moves) = parse(input.components(separatedBy: .newlines))
+        
+        for (move, from, to) in moves {
+            let grabbed = state[from-1].suffix(move)
+            state[from-1].removeLast(move)
+            
+            state[to-1].append(contentsOf: grabbed)
+        }
+        return String(state.map{$0.last!})
     }
 }

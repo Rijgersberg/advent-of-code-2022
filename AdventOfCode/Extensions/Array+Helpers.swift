@@ -16,3 +16,9 @@ extension Array {
         }
     }
 }
+
+extension Array where Element: AdditiveArithmetic {
+    func sum() -> Element {
+        return self.reduce(Element.zero, +)
+    }
+}
