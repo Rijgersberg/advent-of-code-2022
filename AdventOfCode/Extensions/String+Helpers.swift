@@ -8,6 +8,12 @@
 import Foundation
 
 extension String {
+    func substring(_ from: Int, _ to: Int) -> Substring {
+        let start = self.index(self.startIndex, offsetBy: from)
+        let end = self.index(self.startIndex, offsetBy: to)
+        return self[start..<end]
+    }
+    
     var lines: [Substring] {
         split(separator: "\n")
     }
