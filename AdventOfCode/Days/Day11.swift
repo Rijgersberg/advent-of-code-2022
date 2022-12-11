@@ -44,7 +44,7 @@ final class Day11: Day {
             case "new = old + 3": self.operation = {$0 + 3}
             case "new = old * 19": self.operation = {$0 * 19}
                 
-            default: self.operation = {$0}
+            default: fatalError("Unknown operation")
             }
             
             // "Test: divisible by 23"
@@ -79,6 +79,10 @@ final class Day11: Day {
             }
             return output
         }
+        
+        mutating func catchItem(item: Int) {
+            items.append(item)
+        }
     }
     
     func part1(_ input: String) -> CustomStringConvertible {
@@ -89,7 +93,7 @@ final class Day11: Day {
             for i in 0..<monkeys.count {
                 let output = monkeys[i].turn()
                 for (destination, item) in output {
-                    monkeys[destination].items.append(item)
+                    monkeys[destination].catchItem(item: item)
                 }
             }
         }
@@ -107,7 +111,7 @@ final class Day11: Day {
             for i in 0..<monkeys.count {
                 let output = monkeys[i].turn()
                 for (destination, item) in output {
-                    monkeys[destination].items.append(item)
+                    monkeys[destination].catchItem(item: item)
                 }
             }
         }
